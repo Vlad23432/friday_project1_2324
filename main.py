@@ -1,5 +1,5 @@
-import sys
 import pygame as pg
+import game_fuctions as gf
 from settings import Settings
 from ship import Ship
 
@@ -12,15 +12,16 @@ def run_game():
     pg.init()  # инициализируем pygame
     screen = pg.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))  # создаем экран игры разрешением 1280х720px
     pg.display.set_caption('alien invasion')
+
+
+
     ship = Ship(screen)
+
+
+
     while True:  # цикл игры
-        for event in pg.event.get():  # обработчик событий pygame
-            if event.type == pg.QUIT:
-                pg.quit()
-                sys.exit()
-        screen.fill(ai_settings.bg_color)
-        ship.blitme()
-        pg.display.flip()
+        gf.check_events()
+        gf.update_screen(ai_settings,screen, ship)
 
 
 
