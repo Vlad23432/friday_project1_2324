@@ -15,7 +15,7 @@ def run_game():
 
 
 
-    ship = Ship(screen)
+    ship = Ship(ai_settings, screen)
 
 
 
