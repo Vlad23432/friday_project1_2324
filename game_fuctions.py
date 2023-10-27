@@ -34,8 +34,8 @@ def check_events(settings, screen, ship, bullets):
 
 
 def update_screen(settings, screen, ship, bullets, aliens):
-    # screen.fill(settings.bg_color)  # заливаем экран игры цветом
-    screen.blit(settings.bg, (0, 0))
+    screen.fill(settings.bg_color)  # заливаем экран игры цветом
+    #screen.blit(settings.bg, (0, 0))
     for bullet in bullets:
         bullet.draw_bullet()
     ship.blitme()
@@ -43,11 +43,16 @@ def update_screen(settings, screen, ship, bullets, aliens):
     pg.display.flip()  # обновление кадров в игре
 
 
-def update_bullets(bullets):
+def update_bullets(bullets, aliens, settings, screen, ship):
     bullets.update()  # применяю метод update ко ВСЕМ ПУЛЯМ В ГРУППЕ
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
+    collisions = pg.sprite.groupcollide(bullets, aliens, True, True)
+
+    if len(aliens) == 0:
+        bullets.empty()
+        create_fleet(settings, screen, aliens, ship)
 
 
 def fire_bullet(settings, screen, ship, bullets):
@@ -84,3 +89,19 @@ def create_fleet(settings, screen, aliens, ship):
     for row_number in range(number_rows):
         for alien_number in range(number_aliens):
             create_alien(settings, screen, aliens, alien_number, row_number)
+
+def check_fleet_edges(settings, aliens):
+    for alien in aliens.sprites():
+        if alien.check_edges():
+            change_fleet_direction(settings, aliens)
+            break
+
+
+def change_fleet_direction(settings, aliens):
+    for alien in aliens.sprites():
+        alien.rect.y += settings.fleet_drop_speed
+    settings.fleet_direction *= -1
+
+def update_aliens(aliens, settings):
+    check_fleet_edges(settings, aliens)
+    aliens.update()
