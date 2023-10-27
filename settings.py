@@ -9,7 +9,10 @@ class Settings:
         self.screen_height = 800
         self.bg = pg.image.load('images/3.jpg')
         self.bg_color = (0, 0, 0)
+
+
         self.ship_speed_factor = 2
+        self.ship_limit = 2
 
         # настройки пули
         self.bullet_width = 4
@@ -20,5 +23,5 @@ class Settings:
 
 
         self.alien_speed_factor = 1
-        self.fleet_drop_speed = 5
+        self.fleet_drop_speed = 50
         self.fleet_direction = 1
