@@ -24,7 +24,7 @@ def check_keyup_events(event, ship):
         ship.moving_left = False
 
 
-def check_events(settings, screen, ship, bullets, stats, btn, aliens):
+def check_events(settings, screen, ship, bullets, stats, btn, aliens, sb):
     for event in pg.event.get():  # обработчик событий pygame
         if event.type == pg.QUIT:
             pg.quit()
@@ -35,10 +35,10 @@ def check_events(settings, screen, ship, bullets, stats, btn, aliens):
             check_keyup_events(event, ship)
         elif event.type == pg.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pg.mouse.get_pos()
-            check_play_button(stats, btn, mouse_x, mouse_y, settings, screen, ship, bullets, aliens)
+            check_play_button(stats, btn, mouse_x, mouse_y, settings, screen, ship, bullets, aliens, sb)
 
 
-def check_play_button(stats, btn, mouse_x, mouse_y, settings, screen, ship, bullets, aliens):
+def check_play_button(stats, btn, mouse_x, mouse_y, settings, screen, ship, bullets, aliens, sb):
     button_clicked = btn.rect.collidepoint(mouse_x, mouse_y)
     if button_clicked and not stats.game_active:
         settings.initialize_dynamic_settings()
@@ -52,9 +52,13 @@ def check_play_button(stats, btn, mouse_x, mouse_y, settings, screen, ship, bull
         create_fleet(settings, screen, aliens, ship)
         ship.center_ship()
 
+        sb.prep_level()
+        sb.prep_score()
+        sb.prep_ships()
+
 def update_screen(settings, screen, ship, bullets, aliens, stats, btn, sb):
-    screen.fill(settings.bg_color)  # заливаем экран игры цветом
-    #screen.blit(settings.bg, (0, 0))
+    #screen.fill(settings.bg_color)  # заливаем экран игры цветом
+    screen.blit(settings.bg, (0, 0))
     for bullet in bullets:
         bullet.draw_bullet()
     ship.blitme()
@@ -77,12 +81,17 @@ def update_bullets(bullets, aliens, settings, screen, ship, sb, stats):
 
 def check_bullet_alien_collision(bullets, aliens, settings, screen, ship, sb, stats):
     collisions = pg.sprite.groupcollide(bullets, aliens, True, True)
-    if collisions:
+    for aliens in collisions.values():
+        stats.score += settings.alien_points * len(aliens)
+        sb.prep_score()
+    if len(aliens) == 0:
+        stats.level += 1
+        sb.prep_level()
         bullets.empty()
         settings.increase_speed()
         create_fleet(settings, screen, aliens, ship)
         stats.score += settings.alien_points
-        sb.prep_score()
+
 
 
 def fire_bullet(settings, screen, ship, bullets):
@@ -135,19 +144,20 @@ def change_fleet_direction(settings, aliens):
     settings.fleet_direction *= -1
 
 
-def update_aliens(aliens, settings, ship, stats, screen, bullets):
+def update_aliens(aliens, settings, ship, stats, screen, bullets, sb):
     check_fleet_edges(settings, aliens)
     aliens.update()
 
     if pg.sprite.spritecollideany(ship, aliens):
-        ship_hit(settings, stats, screen, ship, aliens, bullets)
+        ship_hit(settings, stats, screen, ship, aliens, bullets, sb )
 
-    check_aliens_bottom(settings, stats, screen, ship, aliens, bullets)
+    check_aliens_bottom(settings, stats, screen, ship, aliens, bullets, sb)
 
 
-def ship_hit(settings, stats, screen, ship, aliens, bullets):
+def ship_hit(settings, stats, screen, ship, aliens, bullets, sb):
     if stats.ships_left > 1:
         stats.ships_left -= 1
+        sb.prep_ships()
 
         aliens.empty()
         bullets.empty()
@@ -158,9 +168,9 @@ def ship_hit(settings, stats, screen, ship, aliens, bullets):
         stats.game_active = False
         pg.mouse.set_visible(True)
 
-def check_aliens_bottom(settings, stats, screen, ship, aliens, bullets):
+def check_aliens_bottom(settings, stats, screen, ship, aliens, bullets, sb):
     screen_rect = screen.get_rect()
     for alien in aliens.sprites():
         if alien.rect.bottom >= screen_rect.bottom:
-            ship_hit(settings, stats, screen, ship, aliens, bullets)
+            ship_hit(settings, stats, screen, ship, aliens, bullets, sb)
             break
