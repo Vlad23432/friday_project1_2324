@@ -52,13 +52,16 @@ def check_play_button(stats, btn, mouse_x, mouse_y, settings, screen, ship, bull
         create_fleet(settings, screen, aliens, ship)
         ship.center_ship()
 
-def update_screen(settings, screen, ship, bullets, aliens, stats, btn):
+def update_screen(settings, screen, ship, bullets, aliens, stats, btn, sb):
     screen.fill(settings.bg_color)  # заливаем экран игры цветом
     #screen.blit(settings.bg, (0, 0))
     for bullet in bullets:
         bullet.draw_bullet()
     ship.blitme()
     aliens.draw(screen)
+
+    sb.show_score()
+
     if not stats.game_active:
         btn.draw_button()
     pg.display.flip()  # обновление кадров в игре

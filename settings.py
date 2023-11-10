@@ -7,8 +7,8 @@ class Settings:
         self.fleet = None
         self.screen_width = 1280
         self.screen_height = 800
-        self.bg = pg.image.load('images/3.jpg')
-        self.bg_color = (0, 0, 0)
+        self.bg = pg.image.load('bg.jpg')
+        self.bg_color = (255, 255, 255)
 
 
         self.ship_speed_factor = 2
