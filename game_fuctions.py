@@ -67,20 +67,22 @@ def update_screen(settings, screen, ship, bullets, aliens, stats, btn, sb):
     pg.display.flip()  # обновление кадров в игре
 
 
-def update_bullets(bullets, aliens, settings, screen, ship):
+def update_bullets(bullets, aliens, settings, screen, ship, sb, stats):
     bullets.update()  # применяю метод update ко ВСЕМ ПУЛЯМ В ГРУППЕ
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
-    check_bullet_alien_collision(bullets, aliens, settings, screen, ship)
+    check_bullet_alien_collision(bullets, aliens, settings, screen, ship, sb, stats)
 
 
-def check_bullet_alien_collision(bullets, aliens, settings, screen, ship):
+def check_bullet_alien_collision(bullets, aliens, settings, screen, ship, sb, stats):
     collisions = pg.sprite.groupcollide(bullets, aliens, True, True)
-    if len(aliens) == 0:
+    if collisions:
         bullets.empty()
         settings.increase_speed()
         create_fleet(settings, screen, aliens, ship)
+        stats.score += settings.alien_points
+        sb.prep_score()
 
 
 def fire_bullet(settings, screen, ship, bullets):
